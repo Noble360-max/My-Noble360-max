@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Experience ❤️</title>
+
+<style>
+body{
+ margin:0;
+ font-family:cursive;
+ background:linear-gradient(135deg,#ff4e8a,#ff9ecb);
+ color:white;
+ text-align:center;
+ overflow:hidden;
+}
+
+/* SECTIONS */
+.section{
+ display:none;
+ height:100vh;
+ justify-content:center;
+ align-items:center;
+ flex-direction:column;
+ padding:20px;
+}
+.active{display:flex;}
+
+/* BUTTONS */
+.btn{
+ margin-top:20px;
+ padding:12px 25px;
+ border:none;
+ background:white;
+ color:#ff2e63;
+ border-radius:30px;
+ cursor:pointer;
+ font-size:16px;
+ position:relative;
+}
+
+/* "NO" BUTTON ESCAPE */
+#noBtn{
+ position:absolute;
+}
+
+/* GALLERY */
+.gallery{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+ gap:12px;
+ width:90%;
+ max-width:600px;
+}
+
+.gallery img,
+.gallery video{
+ width:100%;
+ height:180px;
+ object-fit:cover;
+ border-radius:15px;
+ cursor:pointer;
+}
+
+/* VIEWER */
+.viewer{
+ position:fixed;
+ inset:0;
+ background:rgba(0,0,0,0.9);
+ display:none;
+ justify-content:center;
+ align-items:center;
+ z-index:1000;
+}
+.viewer img{
+ max-width:90%;
+ max-height:80%;
+ border-radius:15px;
+}
+
+/* HEART RAIN */
+.heart{
+ position:fixed;
+ top:-10px;
+ animation:fall 5s linear infinite;
+}
+@keyframes fall{
+ to{transform:translateY(110vh);opacity:0;}
+}
+
+/* FIREWORKS & CONFETTI */
+.firework, .confetti{
+ position:fixed;
+ width:6px;
+ height:6px;
+ background:yellow;
+ border-radius:50%;
+ pointer-events:none;
+ animation:explode 1s ease-out forwards;
+}
+.confetti{
+ background:orange;
+ width:5px; height:5px;
+}
+@keyframes explode{
+ from{ transform:translate(0,0); opacity:1;}
+ to{ transform:translate(var(--x),var(--y)); opacity:0;}
+}
+
+/* QR */
+.qr{
+ margin-top:20px;
+ background:white;
+ padding:10px;
+ border-radius:15px;
+}
+.qr img{
+ width:150px;
+ height:150px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 1️⃣ WELCOME -->
+<div class="section active" id="s1">
+<h1>Hey Priscilla ❤️</h1>
+<p>I made this just for you 🥺</p>
+<button class="btn" onclick="next(1)">Start Journey ✨</button>
+</div>
+
+<!-- 2️⃣ TYPING -->
+<div class="section" id="s2">
+<h1 id="type"></h1>
+<button class="btn" onclick="next(2)">Next 💌</button>
+</div>
+
+<!-- 3️⃣ COUNTDOWN -->
+<div class="section" id="s3">
+<h1>Countdown To Valentine ⏳</h1>
+<h2 id="count"></h2>
+<button class="btn" onclick="next(3)">See Memories 📸</button>
+</div>
+
+<!-- 4️⃣ GALLERY -->
+<div class="section" id="s4">
+<h1>Our Memories 💕</h1>
+<div class="gallery">
+  <img src="pht1.jpeg" onclick="view(this.src)">
+  <img src="pht2.jpeg" onclick="view(this.src)">
+  <img src="pht3.jpeg" onclick="view(this.src)">
+  <img src="pht4.jpeg" onclick="view(this.src)">
+  <video onclick="this.play()" muted>
+    <source src="us1.mp4" type="video/mp4">
+  </video>
+  <video onclick="this.play()" muted>
+    <source src="us2.mp4" type="video/mp4">
+  </video>
+</div>
+<button class="btn" onclick="next(4)">Surprise 🎁</button>
+</div>
+
+<!-- 5️⃣ LOVE MESSAGE -->
+<div class="section" id="s5">
+<h1>I Love You So Much Priscilla 🥺❤️‍🩹</h1>
+<p>
+Forever grateful for you…<br>
+You’re the best thing that ever happened to me 🥺❤️<br>
+If I had to choose again, I’ll still choose you… every single time ♾️💞
+</p>
+<button class="btn" onclick="next(5)">One More Thing… 💍</button>
+</div>
+
+<!-- 6️⃣ PROPOSAL -->
+<div class="section" id="s6">
+<h1>Will You Be My Bestie Forever, Priscilla? 💍</h1>
+<button class="btn" onclick="finale()">YES 💕</button>
+<button class="btn" id="noBtn">NO 😢</button>
+
+<!-- WHATSAPP SHARE -->
+<a id="waLink" target="_blank">
+<button class="btn">Share This With Me 💬</button>
+</a>
+
+<!-- QR CODE -->
+<div class="qr">
+<img id="qrImg">
+<p style="color:black;">Scan To Open Again 📱</p>
+</div>
+</div>
+
+<!-- IMAGE VIEWER -->
+<div class="viewer" id="viewer" onclick="this.style.display='none'">
+<img id="viewerImg">
+</div>
+
+<!-- MUSIC -->
+<audio autoplay loop>
+<source src="Daylight.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* NAVIGATION */
+let currentSection = 1;
+function next(n){
+ document.getElementById("s"+n).classList.remove("active");
+ currentSection = n+1;
+ document.getElementById("s"+currentSection).classList.add("active");
+}
+
+/* SWIPE NAVIGATION */
+let startX = 0;
+document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+document.addEventListener('touchend', e => {
+ let endX = e.changedTouches[0].clientX;
+ if(endX - startX > 50) swipeLeft();
+ if(startX - endX > 50) swipeRight();
+});
+function swipeLeft(){ if(currentSection>1){next(currentSection-1);} }
+function swipeRight(){ if(currentSection<6){next(currentSection);} }
+
+/* TYPING */
+let text="Happy Valentine’s Day, My Beautiful Bestie Priscilla ❤️";
+let i=0;
+function typing(){
+ if(i<text.length){
+  document.getElementById("type").innerHTML+=text.charAt(i);
+  i++;
+  setTimeout(typing,70);
+ }
+}
+typing();
+
+/* COUNTDOWN */
+let val=new Date("Feb 14, 2026 00:00:00").getTime();
+setInterval(()=>{
+ let now=new Date().getTime();
+ let d=Math.floor((val-now)/(1000*60*60*24));
+ document.getElementById("count").innerHTML=d+" days left 💘";
+},1000);
+
+/* IMAGE VIEW */
+function view(src){
+ document.getElementById("viewer").style.display="flex";
+ document.getElementById("viewerImg").src=src;
+}
+
+/* HEART RAIN */
+setInterval(()=>{
+ let h=document.createElement("div");
+ h.className="heart";
+ h.innerHTML="💖";
+ h.style.left=Math.random()*100+"vw";
+ h.style.fontSize=(Math.random()*20+10)+"px";
+ document.body.appendChild(h);
+ setTimeout(()=>h.remove(),5000);
+},300);
+
+/* PROPOSAL FUN */
+let noBtn = document.getElementById("noBtn");
+noBtn.addEventListener('mouseover', ()=>{
+ noBtn.style.left = Math.random()*80 + "%";
+ noBtn.style.top = Math.random()*70 + "%";
+});
+
+/* FINALE + FIREWORKS + CONFETTI */
+function finale(){
+ alert("You’re stuck with me forever Priscilla 😄💕");
+ for(let i=0;i<80;i++){
+  let f=document.createElement("div");
+  f.className=Math.random()>0.5?"firework":"confetti";
+  let x=(Math.random()*400-200)+"px";
+  let y=(Math.random()*400-200)+"px";
+  f.style.setProperty("--x",x);
+  f.style.setProperty("--y",y);
+  f.style.left=Math.random()*100+"vw";
+  f.style.top=Math.random()*100+"vh";
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),1000);
+ }
+}
+
+/* WHATSAPP SHARE */
+let siteURL=window.location.href;
+let message="Priscilla ❤️ Check this surprise I made for you 👉 "+siteURL;
+document.getElementById("waLink").href=
+"https://wa.me/?text="+encodeURIComponent(message);
+
+/* QR CODE GENERATOR */
+let qrURL =
+"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data="
++encodeURIComponent(window.location.href);
+document.getElementById("qrImg").src = qrURL;
+
+</script>
+</body>
+</html>
+git init
